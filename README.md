@@ -31,8 +31,8 @@ This approach allows for cookieless authentication of MPEG-DASH content within t
 
 1.  **Clone the Repository:**
     ```bash
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/chankh/token-redirect-plugin
+    cd token-redirect-plugin
     ```
 
 2.  **Build and Upload the Plugin**
