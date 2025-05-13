@@ -1,0 +1,156 @@
+edgeSslCertificates:
+- projects/<PROJECT_ID>/locations/global/certificates/<CERTIFICATE>
+logConfig:
+  enable: true
+  sampleRate: 1.0
+name: projects/<PROJECT_NAME>/locations/global/edgeCacheServices/<EDGE_NAME>
+requireTls: true
+routing:
+  hostRules:
+  - hosts:
+    - cdn.khk.io
+    pathMatcher: path-matcher-0
+  pathMatchers:
+  - name: path-matcher-0
+    routeRules:
+    - description: 'Signed-token: HLS media playlists'
+      headerAction: {}
+      matchRules:
+      - pathTemplateMatch: /**/manifest.m3u8
+      origin: projects/<PROJECT_ID>/locations/global/edgeCacheOrigins/<ORIGIN>
+      priority: 1
+      routeAction:
+        cdnPolicy:
+          addSignatures:
+            actions:
+            - GENERATE_TOKEN_HLS_COOKIELESS
+            copiedParameters:
+            - URLPrefix
+            keyset: projects/<PROJECT_NAME>/locations/global/edgeCacheKeysets/<LONG_KEYSET>
+            tokenQueryParameter: hdntl
+            tokenTtl: 86400s
+          cacheKeyPolicy: {}
+          cacheMode: FORCE_CACHE_ALL
+          defaultTtl: 3600s
+          signedRequestKeyset: projects/<PROJECT_NAME>/locations/global/edgeCacheKeysets/<SHORT_KEYSET>
+          signedRequestMode: REQUIRE_TOKENS
+          signedTokenOptions:
+            allowedSignatureAlgorithms:
+            - ED25519
+            tokenQueryParameter: hdnts
+        compressionMode: DISABLED
+        corsPolicy:
+          allowOrigins:
+          - '*'
+          maxAge: 600s
+    - description: 'Dual-token: cookie-less HLS media playlists'
+      headerAction: {}
+      matchRules:
+      - pathTemplateMatch: /**.m3u8
+      origin: projects/<PROJECT_ID>/locations/global/edgeCacheOrigins/<ORIGIN>
+      priority: 3
+      routeAction:
+        cdnPolicy:
+          addSignatures:
+            actions:
+            - PROPAGATE_TOKEN_HLS_COOKIELESS
+            tokenQueryParameter: hdntl
+          cacheKeyPolicy: {}
+          cacheMode: FORCE_CACHE_ALL
+          defaultTtl: 3600s
+          signedRequestKeyset: projects/<PROJECT_NAME>/locations/global/edgeCacheKeysets/<LONG_KEYSET>
+          signedRequestMode: REQUIRE_TOKENS
+          signedTokenOptions:
+            allowedSignatureAlgorithms:
+            - ED25519
+            tokenQueryParameter: hdntl
+        compressionMode: DISABLED
+        corsPolicy:
+          allowOrigins:
+          - '*'
+          maxAge: 600s
+    - description: 'Dual-token: cookie-less HLS media segments'
+      headerAction: {}
+      matchRules:
+      - pathTemplateMatch: /**.ts
+      origin: projects/<PROJECT_ID>/locations/global/edgeCacheOrigins/<ORIGIN>
+      priority: 4
+      routeAction:
+        cdnPolicy:
+          cacheKeyPolicy: {}
+          cacheMode: FORCE_CACHE_ALL
+          defaultTtl: 3600s
+          signedRequestKeyset: projects/<PROJECT_NAME>/locations/global/edgeCacheKeysets/<LONG_KEYSET>
+          signedRequestMode: REQUIRE_TOKENS
+          signedTokenOptions:
+            allowedSignatureAlgorithms:
+            - ED25519
+            tokenQueryParameter: hdntl
+        compressionMode: DISABLED
+        corsPolicy:
+          allowOrigins:
+          - '*'
+          maxAge: 600s
+    - description: 'Path-token: redirect to query parameter'
+      headerAction: {}
+      matchRules:
+      - pathTemplateMatch: /{token=edge-cache-token/*}/{path=**}
+      origin: projects/<PROJECT_ID>/locations/global/edgeCacheOrigins/<ORIGIN>
+      priority: 2
+      routeAction:
+        urlRewrite:
+          pathTemplateRewrite: /{path}
+        compressionMode: DISABLED
+        corsPolicy:
+          allowOrigins:
+          - '*'
+          maxAge: 600s
+        wasmAction: projects/<PROJECT_ID>/locations/global/wasmActions/token-redirect-action
+    - description: 'Signed-token: DASH media manifest'
+      headerAction: {}
+      matchRules:
+      - pathTemplateMatch: /**.mpd
+      origin: projects/<PROJECT_ID>/locations/global/edgeCacheOrigins/<ORIGIN>
+      priority: 7
+      routeAction:
+        cdnPolicy:
+          cacheKeyPolicy: {}
+          cacheMode: FORCE_CACHE_ALL
+          defaultTtl: 3600s
+          signedRequestKeyset: projects/<PROJECT_NAME>/locations/global/edgeCacheKeysets/<SHORT_KEYSET>
+          signedRequestMode: REQUIRE_TOKENS
+          signedTokenOptions:
+            allowedSignatureAlgorithms:
+            - ED25519
+            tokenQueryParameter: hdnts
+        compressionMode: DISABLED
+        corsPolicy:
+          allowOrigins:
+          - '*'
+          maxAge: 600s
+        wasmAction: projects/<PROJECT_ID>/locations/global/wasmActions/token-redirect-action
+    - description: 'Signed-token: DASH media segments'
+      headerAction: {}
+      matchRules:
+      - pathTemplateMatch: /**.m4s
+      - pathTemplateMatch: /**.mp4
+      - pathTemplateMatch: /**.m4a
+      - pathTemplateMatch: /**.m4v
+      origin: projects/<PROJECT_ID>/locations/global/edgeCacheOrigins/<ORIGIN>
+      priority: 8
+      routeAction:
+        cdnPolicy:
+          cacheKeyPolicy: {}
+          cacheMode: FORCE_CACHE_ALL
+          defaultTtl: 3600s
+          signedRequestKeyset: projects/<PROJECT_NAME>/locations/global/edgeCacheKeysets/<SHORT_KEYSET>
+          signedRequestMode: REQUIRE_TOKENS
+          signedTokenOptions:
+            allowedSignatureAlgorithms:
+            - ED25519
+            tokenQueryParameter: hdnts
+        compressionMode: DISABLED
+        corsPolicy:
+          allowOrigins:
+          - '*'
+          maxAge: 600s
