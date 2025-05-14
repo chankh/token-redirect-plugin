@@ -104,7 +104,7 @@ func (ctx *httpContext) OnHttpRequestHeaders(numHeaders int, endOfStream bool) t
 		proxywasm.LogInfof("tokenValue: %s", tokenValue)
 		if tokenValue != "" {
 			// Token is passed as query parameter here, we need to redirect to path
-			newPath = "/" + TOKEN_PREFIX + "/" + tokenValue + req[0]
+			newPath = "/" + TOKEN_PREFIX + "/" + tokenValue + path
 			isRedirect = true
 		}
 	} else {
